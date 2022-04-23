@@ -1,22 +1,22 @@
 import {PacksTable} from './PacksTable/PacksTable'
 import t from '../../../common/styles/Themes.module.css'
 import c from '../../../common/styles/Container.module.css'
-import {useAppSelector} from '../../../bll/store';
 import {SuperButton} from '../../../common/super-components/c2-SuperButton/SuperButton';
 import {SearchField} from '../../Features/SearchField/SearchField';
 import {SuperRadio} from '../../../common/super-components/c6-SuperRadio/SuperRadio';
 import {useDispatch} from 'react-redux';
-import {packsActions} from '../PacksBLL/packs-reducer';
+import {packsActions, PacksType} from '../PacksBLL/packs-reducer';
 import {DoubleRange} from '../../Features/DoubleRange/DoubleRange';
-import {selectPackNameForSearch,
-    //selectPackUserId,
+import {
+    selectPackNameForSearch, selectPacksType,
     selectTheme,
     selectUser_id
-} from '../../../selectors/selectors';
+} from '../../../store/selectors';
 import {useCallback, useState} from 'react';
 import {AddPackForm} from '../../Modals/AddPackForm/AddPackForm';
+import {useAppSelector} from '../../../store/store';
 
-const arr = ['All', 'My']
+const arr: PacksType[] = ['All', 'My']
 
 export const Packs = () => {
     const [isAddingOpen, setIsAddingOpen] = useState<boolean>(false)
@@ -24,21 +24,18 @@ export const Packs = () => {
     const theme = useAppSelector(selectTheme)
     const user_id = useAppSelector(selectUser_id)
     const packName = useAppSelector(selectPackNameForSearch)
-    //const packUserId = useAppSelector(selectPackUserId)
-    const type = useAppSelector(state=> state.packs.packsType)
+    const type = useAppSelector(selectPacksType)
 
     const dispatch = useDispatch()
 
     {type === "All" ? dispatch(packsActions.setPacksForUser(""))
         : dispatch(packsActions.setPacksForUser(user_id))}
 
-    //const [valueFromArray, setValueFromArray] = useState(packUserId ? 'My' : 'All')
-
     const [valueFromArray, setValueFromArray] = useState(arr[0])
 
     const onChangeOption = useCallback((value: string) => {
-        setValueFromArray(value)
-        dispatch(packsActions.setPacksType(value))
+        setValueFromArray(value as PacksType)
+        dispatch(packsActions.setPacksType(value as PacksType))
         if (value === 'All') {
             dispatch(packsActions.setPacksForUser(''))
         } else {
@@ -64,18 +61,17 @@ export const Packs = () => {
             <AddPackForm onClickNotOpen={addPackOff} isOpen={isAddingOpen}/>
             <div className={`${c.container} ${t[theme + '-text']}`}>
                 <div className={c.settings}>
-                    <div className={c.text}>Show packs cards</div>
-                    <SuperRadio name={'radio'} options={arr}
-                                value={valueFromArray} onChangeOption={onChangeOption}
-                    />
-                    <DoubleRange/>
+                    <div className={c.text}>Packs</div>
+                    <div><SuperRadio name={'radio'} options={arr} value={valueFromArray}
+                                onChangeOption={onChangeOption}/></div>
+                        <div><DoubleRange/></div>
                 </div>
                 <div className={c.performance}>
                     <div className={c.title}>Packs list</div>
                     <div className={c.rowElements}>
                         <SearchField onChangeWithDebounce={onChangeDebounceRequest}
                                      value={packName} wide
-                                     placeholder={'Enter pack\'s title for search'}/>
+                                     placeholder={'Enter search title'}/>
                         <SuperButton className={c.addItem} onClick={addPackOn}>
                             Add pack
                         </SuperButton>

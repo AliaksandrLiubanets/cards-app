@@ -2,7 +2,6 @@ import {CardsTable} from './CardsTable/CardsTable'
 import t from '../../../common/styles/Themes.module.css'
 import s from './Cards.module.css'
 import c from '../../../common/styles/Container.module.css'
-import {useAppSelector} from '../../../bll/store';
 import {useCallback, useState} from 'react';
 import {SearchField} from '../../Features/SearchField/SearchField';
 import {useNavigate, useParams} from 'react-router-dom';
@@ -11,12 +10,13 @@ import {useDispatch} from 'react-redux';
 import {cardsActions} from '../CardsBLL/cards-reducer';
 import {
     selectCardAnswer,
-    selectCardQuestion,
+    selectCardQuestion, selectPackId,
     selectPackName,
     selectTheme,
     selectUser_id
-} from '../../../selectors/selectors';
+} from '../../../store/selectors';
 import {AddCardForm} from '../../Modals/AddCardForm/AddCardForm';
+import {useAppSelector} from '../../../store/store';
 
 export const Cards = () => {
     const [isAddingOpen, setIsAddingOpen] = useState<boolean>(false)
@@ -25,7 +25,7 @@ export const Cards = () => {
     const packName = useAppSelector(selectPackName)
     const cardQuestion = useAppSelector(selectCardQuestion)
     const cardAnswer = useAppSelector(selectCardAnswer)
-    const cardsPack_id = useAppSelector(state => state.cards.params.cardsPack_id)
+    const cardsPack_id = useAppSelector(selectPackId)
     const userId = useAppSelector(selectUser_id)
 
     const dispatch = useDispatch()

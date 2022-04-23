@@ -1,14 +1,14 @@
 import {FC, memo, useCallback, useState} from 'react'
-import {getLastUpdatedDate} from '../../../../../../utils/date-helpers'
 import {CardType} from '../../../../CardsAPI/cards-api'
 import s from '../../../Cards.module.css'
-import a from '../../../../../../common/styles/Actions.module.css'
+import t from '../../../../../../common/styles/Table.module.css'
 import {SuperButton} from '../../../../../../common/super-components/c2-SuperButton/SuperButton'
-import {useAppSelector} from '../../../../../../bll/store'
-import {selectUser_id} from '../../../../../../selectors/selectors'
+import {selectUser_id} from '../../../../../../store/selectors'
 import {DeleteCardForm} from '../../../../../Modals/DeleteCardForm/DeleteCardForm'
 import {EditCardForm} from '../../../../../Modals/EditCardForm/EditCardForm'
 import {useParams} from 'react-router-dom'
+import {getLastUpdatedDate} from '../../../../../../utils/getLastUpdatedDate';
+import {useAppSelector} from '../../../../../../store/store';
 
 type CardPropsType = {
     card: CardType
@@ -48,9 +48,9 @@ export const Card: FC<CardPropsType> = memo(({card}) => {
         <td>{lastUpdate}</td>
         <td>{card.grade.toFixed(2)}</td>
         {userId === packUserId && <td className={s.actions}>
-          <div className={a.actionButtons}>
-            <SuperButton onClick={editCardOn} className={s.button}>✎</SuperButton>
-            <SuperButton red onClick={deleteCardOn} className={s.button}>✘</SuperButton>
+          <div className={t.actionButtons}>
+            <SuperButton onClick={editCardOn}>✎</SuperButton>
+            <SuperButton red onClick={deleteCardOn}>✘</SuperButton>
           </div>
         </td>}
     </tr>

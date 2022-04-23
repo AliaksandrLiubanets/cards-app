@@ -1,9 +1,7 @@
 import {useDispatch} from 'react-redux';
 import React, {useCallback, useEffect} from 'react';
 import {CardsList} from './CardsList/CardsList';
-import s from './CardsTable.module.css'
-import a from '../../../../common/styles/Actions.module.css'
-import {useAppSelector} from '../../../../bll/store';
+import t from '../../../../common/styles/Table.module.css'
 import {cardsActions, getCards} from '../../CardsBLL/cards-reducer';
 import {
     selectCards,
@@ -14,10 +12,11 @@ import {
     selectPageForCards,
     selectSortCards,
     selectUser_id
-} from '../../../../selectors/selectors';
+} from '../../../../store/selectors';
 import {Paginator} from '../../../Features/Paginator/Paginator';
 import {CardsTableHeader} from './CardsTableHeader/CardsTableHeader';
 import {useParams} from 'react-router-dom';
+import {useAppSelector} from '../../../../store/store';
 
 export const CardsTable = () => {
     const cards = useAppSelector(selectCards)
@@ -48,8 +47,8 @@ export const CardsTable = () => {
         dispatch(cardsActions.setCardsPageCount(amountOfPacks))
     }, [dispatch])
 
-    return <div className={s.cardsTableContainer}>
-        <table className={s.table}>
+    return <div className={t.tableContainer}>
+        <table className={t.table}>
             <thead>
             <tr>
                 <CardsTableHeader text={'Question'} param={'question'}/>
@@ -58,7 +57,7 @@ export const CardsTable = () => {
                 <CardsTableHeader text={'Grade'} param={'grade'}/>
                 {
                     userId === packUserId &&
-                    <th className={a.actions}>
+                    <th className={t.actions}>
                       <span>Actions</span>
                     </th>
                 }
@@ -66,13 +65,17 @@ export const CardsTable = () => {
             </thead>
             <tbody>
             <CardsList cards={cards}/>
+            <tr>
+                <td colSpan={5} className={t.pagination}>
+                    <div>
+                        <Paginator onChangeSetAmountOfItems={onChangeSetAmountOfCards}
+                                   onPageChanged={onPageChanged}
+                                   itemsTotalCount={cardsTotalCount}
+                                   pageCount={pageCount} page={page}/>
+                    </div>
+                </td>
+            </tr>
             </tbody>
         </table>
-        <div className={s.pagination}>
-            <Paginator onChangeSetAmountOfItems={onChangeSetAmountOfCards}
-                       onPageChanged={onPageChanged}
-                       itemsTotalCount={cardsTotalCount}
-                       pageCount={pageCount} page={page}/>
-        </div>
     </div>
 }

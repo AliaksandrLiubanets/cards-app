@@ -1,10 +1,9 @@
 import {profileActions} from '../../../Profile/ProfileBLL/profile-reducer';
-import {AppThunk, InferActionTypes} from '../../../../bll/store';
 import {loginAPI, LoginType} from '../LoginAPI/login-api';
 import axios from 'axios';
 import {packsActions} from '../../../Packs/PacksBLL/packs-reducer';
-import {cardsActions} from '../../../Cards/CardsBLL/cards-reducer';
 import {UserType} from '../../../Profile/ProfileAPI/profile-api';
+import {AppThunk, InferActionTypes} from '../../../../store/store';
 
 export const loginInitialState = {
     isLoggedIn: false,
@@ -55,11 +54,11 @@ export const login = (login: LoginType): AppThunk => async dispatch => {
 export const logout = (): AppThunk => async dispatch => {
     try {
         await loginAPI.logout()
-        dispatch(profileActions.setEditModeProfile(false))
+        dispatch(loginActions.setLoginError(''))
+        dispatch(profileActions.setEditMode(false))
         dispatch(loginActions.setIsLoggedIn(false))
         dispatch(profileActions.setUserData({} as UserType))
         dispatch(packsActions.setPacks([]))
-        dispatch(cardsActions.setCards([]))
         dispatch(packsActions.setTitleForSearch(''))
     } catch (e) {
         if (axios.isAxiosError(e)) {

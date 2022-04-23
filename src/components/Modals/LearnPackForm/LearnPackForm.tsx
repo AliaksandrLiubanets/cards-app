@@ -2,11 +2,16 @@ import {FC, memo, useCallback, useState} from 'react'
 import {Modal} from '../Modal/Modal'
 import {SuperButton} from '../../../common/super-components/c2-SuperButton/SuperButton'
 import {AnswerForm} from '../AnswerForm/AnswerForm'
-import {useAppSelector} from '../../../bll/store'
-import {selectTheme} from '../../../selectors/selectors'
+import {
+    selectAppIsLoading,
+    selectRandomCard,
+    selectTheme
+} from '../../../store/selectors'
 import {Preloader} from '../../../common/preloader/Preloader'
 import {useDispatch} from 'react-redux'
-import {cleanLearnState} from '../../../bll/learn-reducer'
+import {CardType} from '../../Cards/CardsAPI/cards-api';
+import {useAppSelector} from '../../../store/store';
+import {learnActions} from '../../../store/learnReducer';
 
 type LearnPackFormPropsType = {
     onClickLearnPackOn: () => void
@@ -21,47 +26,47 @@ export const LearnPackForm: FC<LearnPackFormPropsType> = memo(({
                                                                    name
                                                                }) => {
     const theme = useAppSelector(selectTheme)
-    const isLearnLoading = useAppSelector(state => state.learn.isLearnLoading)
-    const randomCard = useAppSelector(state => state.learn.randomCard)
+    const isLoading = useAppSelector(selectAppIsLoading)
+    const randomCard = useAppSelector(selectRandomCard)
 
     const dispatch = useDispatch()
 
     const [isAnswerOpen, setIsAnswerOpen] = useState<boolean>(false)
 
-    const AnswerOff = useCallback(() => {
+    const setAnswerOff = useCallback(() => {
         setIsAnswerOpen(false)
     }, [])
 
-    const AnswerOn = useCallback(() => {
+    const setAnswerOn = useCallback(() => {
         onClickNotOpen()
         setIsAnswerOpen(true)
     }, [onClickNotOpen])
 
-    const cancel = useCallback(() => {
-        dispatch(cleanLearnState())
+    const onClickStopLearning = useCallback(() => {
+        dispatch(learnActions.setRandomCard({} as CardType))
+        dispatch(learnActions.setCards([]))
         onClickNotOpen()
     }, [onClickNotOpen])
 
-
     return <>
-        <AnswerForm onClickNotOpen={AnswerOff} isOpen={isAnswerOpen} name={name} card={randomCard}
+        <AnswerForm onClickNotOpen={setAnswerOff} isOpen={isAnswerOpen} name={name}
                     onClickLearnPackOn={onClickLearnPackOn}/>
-        <Modal onClickNotOpen={onClickNotOpen} width={460} height={220} isOpen={isOpen}
-               backgroundStyle={{background: `${theme === '☀' ? '#d0eca1' : '#022507'}`,
-                   opacity: 1}}>
+        <Modal onClickNotOpen={onClickStopLearning} isOpen={isOpen}
+               backgroundStyle={{
+                   background: `${theme === '☀' ? '#d0eca1' : '#022507'}`,
+                   opacity: 1
+               }}>
             {
-                isLearnLoading
-                    ? <Preloader />
-                    : <>
+                isLoading ? <Preloader/> :
+                    <>
                         <div>Learn '{name}'</div>
                         <div>Question: '{randomCard.question}'</div>
                         <div>
-                            <SuperButton onClick={cancel}>Cancel</SuperButton>
-                            <SuperButton onClick={AnswerOn}>Show answer</SuperButton>
+                            <SuperButton onClick={onClickStopLearning}>Cancel</SuperButton>
+                            <SuperButton onClick={setAnswerOn}>Show answer</SuperButton>
                         </div>
                     </>
             }
-
         </Modal>
     </>
 })

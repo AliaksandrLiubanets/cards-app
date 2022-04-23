@@ -5,14 +5,13 @@ import profileAva from '../../../assets/images/profile_ava.png'
 import {SuperButton} from '../../../common/super-components/c2-SuperButton/SuperButton'
 import {profileActions} from '../ProfileBLL/profile-reducer'
 import {useDispatch} from 'react-redux'
-import {useAppSelector} from '../../../bll/store'
 import {EditProfile} from './EditProfile/EditProfile'
 import {
     selectPackNameForSearch,
     selectProfileEditMode,
     selectProfileUserName,
     selectTheme, selectUser_id
-} from '../../../selectors/selectors';
+} from '../../../store/selectors';
 import {useCallback, useState} from 'react';
 import {SearchField} from '../../Features/SearchField/SearchField';
 import {PacksTable} from '../../Packs/PacksUI/PacksTable/PacksTable';
@@ -20,6 +19,7 @@ import {packsActions} from '../../Packs/PacksBLL/packs-reducer';
 import {DoubleRange} from '../../Features/DoubleRange/DoubleRange';
 import {AddPackForm} from '../../Modals/AddPackForm/AddPackForm';
 import {useLocation} from 'react-router-dom';
+import {useAppSelector} from '../../../store/store';
 
 export const Profile = () => {
     const [isAddingOpen, setIsAddingOpen] = useState<boolean>(false)
@@ -34,7 +34,7 @@ export const Profile = () => {
     const location = useLocation()
 
     const editProfile = useCallback(() => {
-        dispatch(profileActions.setEditModeProfile(true))
+        dispatch(profileActions.setEditMode(true))
     }, [dispatch])
 
     const onChangeDebounceRequest = useCallback((title: string) => {

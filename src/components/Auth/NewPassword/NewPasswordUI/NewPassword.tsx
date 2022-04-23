@@ -29,10 +29,12 @@ export const NewPassword = memo(({password, password2, setPassword, setPassword2
                                  onEnter={changePassword} eye/></div>
             <span>Confirm password</span>
             <div><SuperInputText value={password2} onChangeText={setPassword2}
-                                 onEnter={changePassword}eye/></div>
+                                 onEnter={changePassword} eye/></div>
             <span>Create new password</span>
             <div className={s.buttons}>
-                <SuperButton disabled={isLoading} onClick={changePassword}>Create new password</SuperButton>
+                <SuperButton disabled={isLoading} onClick={changePassword}>
+                    Create new password
+                </SuperButton>
             </div>
             <div className={s.error}>{error}</div>
         </div>

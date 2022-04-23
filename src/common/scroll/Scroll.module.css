@@ -8,11 +8,11 @@
     text-transform: none;
     overflow: visible;
     position: fixed;
-    right: 5px;
-    bottom: 5px;
+    right: 10px;
+    bottom: 10px;
     margin-bottom: 5px;
     text-align: center;
-    opacity: 0.7;
+    opacity: 0.8;
 }
 
 .scroll:hover {

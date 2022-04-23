@@ -1,20 +1,21 @@
 import {NavLink} from 'react-router-dom';
 import {useCallback} from 'react';
 import s from './Header.module.css';
-import {PATH} from '../../app/AllRoutes';
 import {useDispatch} from 'react-redux';
-import {useAppSelector} from '../../bll/store';
-import {themeActions, ThemeType} from '../../bll/themeReducer';
 import {SuperSelect} from '../../common/super-components/c5-SuperSelect/SuperSelect';
 import {saveState} from '../../utils/localstorage';
-import {selectIsLoggedIn, selectTheme} from '../../selectors/selectors';
+import {selectIsLoggedIn, selectTheme} from '../../store/selectors';
 import {logout} from '../Auth/Login/LoginBLL/loginReducer';
+import {PATH} from '../../enums/paths';
+import {useAppSelector} from '../../store/store';
+import {themeActions, ThemeType} from '../../store/themeReducer';
 
 const themes = ['☀', '☽']
 
 export const Header = () => {
     const theme = useAppSelector(selectTheme)
     const isLoggedIn = useAppSelector(selectIsLoggedIn)
+
     const dispatch = useDispatch()
 
     const logOut = () => {

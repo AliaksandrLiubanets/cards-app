@@ -3,25 +3,23 @@ import {useDispatch} from 'react-redux'
 import {Modal} from '../Modal/Modal'
 import {SuperButton} from '../../../common/super-components/c2-SuperButton/SuperButton'
 import {SuperRadio} from '../../../common/super-components/c6-SuperRadio/SuperRadio'
-import {useAppSelector} from '../../../bll/store'
-import {selectTheme} from '../../../selectors/selectors'
+import {
+    selectAppIsLoading,
+    selectLearnCards, selectRandomCard,
+    selectTheme
+} from '../../../store/selectors'
 import {CardType} from '../../Cards/CardsAPI/cards-api'
-import {cleanLearnState, rate, setRandomCard} from '../../../bll/learn-reducer'
+import {GRADES} from '../../../enums/grades';
+import {Preloader} from '../../../common/preloader/Preloader';
+import {getRandomCard} from '../../../utils/getRandomCard';
+import {useAppSelector} from '../../../store/store';
+import {learnActions, rate} from '../../../store/learnReducer';
 
 type AnswerFormPropsType = {
     onClickLearnPackOn: () => void
     onClickNotOpen: () => void
     isOpen: boolean
     name: string
-    card: CardType
-}
-
-enum GRADES {
-    ONE = 'Did not know',
-    TWO = 'Forgot',
-    THREE = 'A lot of thought',
-    FOUR = 'Confused',
-    FIVE = 'Knew the answer'
 }
 
 type GradesType = GRADES.ONE | GRADES.TWO | GRADES.THREE | GRADES.FOUR | GRADES.FIVE
@@ -40,63 +38,68 @@ export const Grades: GradesObjectType = {
 
 const arr = [GRADES.ONE, GRADES.TWO, GRADES.THREE, GRADES.FOUR, GRADES.FIVE]
 
-export const AnswerForm: FC<AnswerFormPropsType> = memo(({
-                                                             onClickLearnPackOn,
-                                                             onClickNotOpen,
-                                                             isOpen,
-                                                             name,
-                                                             card
+export const AnswerForm: FC<AnswerFormPropsType> = memo(({onClickLearnPackOn,
+                                                             onClickNotOpen, isOpen, name
                                                          }) => {
     const [value, setValue] = useState<GradesType>(GRADES.ONE)
     const [rateEdit, setRateEdit] = useState<boolean>(false)
 
     const theme = useAppSelector(selectTheme)
+    const isLoading = useAppSelector(selectAppIsLoading)
+    const cards = useAppSelector(selectLearnCards)
+    const randomCard = useAppSelector(selectRandomCard)
 
     const dispatch = useDispatch()
 
-    const next = useCallback(() => {
-        dispatch(setRandomCard())
+    const getNextQuestion = useCallback(() => {
+        dispatch(learnActions.setRandomCard(getRandomCard(cards)))
         onClickNotOpen()
         onClickLearnPackOn()
         setRateEdit(false)
-    }, [dispatch, onClickLearnPackOn, onClickNotOpen])
+        setValue(GRADES.ONE)
+    }, [dispatch, onClickLearnPackOn, onClickNotOpen, cards])
 
     const estimate = useCallback(() => {
-        !rateEdit && dispatch(rate(Grades[value]))
+        dispatch(rate(Grades[value], randomCard._id))
         setRateEdit(true)
-    }, [dispatch, value, rateEdit])
+    }, [dispatch, value, rateEdit, randomCard])
 
-    const onChangeOption = useCallback((value: string) => {
-        setValue(value as GradesType)
-    }, [value])
-
-    const cancel = () => {
-        dispatch(cleanLearnState())
-        onClickNotOpen()
+    const onChangeOption = useCallback((value: GradesType) => {
+        setValue(value)
         setRateEdit(false)
-    }
+    }, [])
 
-    return <Modal onClickNotOpen={onClickNotOpen} width={460} height={530}
-                  isOpen={isOpen}
+    const onClickStopLearning = useCallback(() => {
+        onClickNotOpen()
+        dispatch(learnActions.setRandomCard({} as CardType))
+        dispatch(learnActions.setCards([]))
+        setRateEdit(false)
+    }, [dispatch, onClickNotOpen])
+
+    return <Modal onClickNotOpen={onClickStopLearning} isOpen={isOpen}
                   backgroundStyle={{
                       background: `${theme === '☀' ? '#d0eca1' : '#022507'}`,
                       opacity: 1
                   }}>
-        <div>
-            <div>Learn '{name}'</div>
-            <div>Question: '{card.question}'</div>
-            <div>Answer: '{card.answer}'</div>
-        </div>
-        <div>
-            <div>Rate yourself:</div>
-            <SuperRadio name={'radio'} options={arr}
-                        value={value} onChangeOption={onChangeOption}
-            />
-        </div>
-        <div>
-            <SuperButton onClick={cancel}>Cancel</SuperButton>
-            <SuperButton onClick={estimate} disabled={rateEdit}>Rate</SuperButton>
-            <SuperButton onClick={next}>Next</SuperButton>
-        </div>
+        {isLoading ? <Preloader/> :
+            <>
+                <div>
+                    <div>Learn '{name}'</div>
+                    <div>Question: '{randomCard.question}'</div>
+                    <div>Answer: '{randomCard.answer}'</div>
+                </div>
+                <div>
+                    <div>Rate yourself:</div>
+                    <SuperRadio name={'radio'} options={arr}
+                                value={value} onChangeOption={onChangeOption}
+                    />
+                </div>
+                <div>
+                    <SuperButton onClick={onClickStopLearning}>Cancel</SuperButton>
+                    <SuperButton onClick={estimate} disabled={rateEdit}>Rate</SuperButton>
+                    <SuperButton onClick={getNextQuestion}>Next</SuperButton>
+                </div>
+            </>
+        }
     </Modal>
 })
