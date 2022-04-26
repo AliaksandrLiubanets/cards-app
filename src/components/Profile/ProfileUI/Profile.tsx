@@ -1,7 +1,7 @@
 import s from './Profile.module.css'
 import c from '../../../common/styles/Container.module.css'
 import t from '../../../common/styles/Themes.module.css'
-import profileAva from '../../../assets/images/profile_ava.png'
+import emptyAva from '../../../assets/images/empty_avatar.png'
 import {SuperButton} from '../../../common/super-components/c2-SuperButton/SuperButton'
 import {profileActions} from '../ProfileBLL/profile-reducer'
 import {useDispatch} from 'react-redux'
@@ -20,6 +20,7 @@ import {DoubleRange} from '../../Features/DoubleRange/DoubleRange';
 import {AddPackForm} from '../../Modals/AddPackForm/AddPackForm';
 import {useLocation} from 'react-router-dom';
 import {useAppSelector} from '../../../store/store';
+import {PATH} from '../../../enums/paths';
 
 export const Profile = () => {
     const [isAddingOpen, setIsAddingOpen] = useState<boolean>(false)
@@ -54,7 +55,7 @@ export const Profile = () => {
         setIsAddingOpen(true)
     }
 
-    if (location.pathname === "/profile") {
+    if (location.pathname === PATH.PROFILE) {
         dispatch(packsActions.setPacksForUser(user_id))
         dispatch(packsActions.setPacksType("All"))
     }
@@ -66,7 +67,7 @@ export const Profile = () => {
                 <div className={c.settings}>
                     <div className={s.profile}>
                         <div className={s.profileAvatar}>
-                            <img src={profileAva} alt={'avatar'}/>
+                            <img src={emptyAva} alt={'avatar'}/>
                         </div>
                         <div className={c.text}>{name}</div>
                         <div className={s.profileJob}>Front-end developer</div>
